@@ -9,7 +9,7 @@ export default function Home() {
           alt="messenger-logo"
           width={48}
           height={48}
-          src="/logo/messenger.png"
+          src="/logo/messenger.webp"
           className="mx-auto w-auto"
         />
         <h2 className="mt-5 text-center text-3xl font-bold tracking-tight text-gray-900">
