@@ -19,14 +19,12 @@ const AuthForm = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
 
-  // useEffect(() => {
-  //   if (session?.status === "authenticated") {
-  //     toast("Authenticated");
-  //     setTimeout(() => {
-  //       router.push("/users");
-  //     }, 2000);
-  //   }
-  // }, [router, session?.status]);
+  useEffect(() => {
+    if (session?.status === "authenticated") {
+      toast("Authenticated");
+      router.push("/users");
+    }
+  }, [router, session?.status]);
 
   const toggleVariant = useCallback(() => {
     if (variant === "LOGIN") {
@@ -59,8 +57,14 @@ const AuthForm = () => {
           signIn("credentials", {
             ...data,
             redirect: false,
+          }).then((callback) => {
+            if (callback?.ok && !callback?.error) {
+              toast.success("Redirecting");
+              router.push("/users");
+            }
           });
         })
+
         .catch(() => {
           toast.error("Something went wrong");
         })

@@ -33,7 +33,7 @@ const useActiveChannel = () => {
     });
 
     return () => {
-      if (!activeChannel) {
+      if (activeChannel) {
         pusherClient.unsubscribe("presence-messenger");
         setActiveChannel(null);
       }
