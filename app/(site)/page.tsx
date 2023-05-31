@@ -7,8 +7,8 @@ export default function Home() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <Image
           alt="messenger-logo"
-          width={48}
-          height={48}
+          width={65}
+          height={65}
           src="/logo/messenger.webp"
           className="mx-auto w-auto"
         />
