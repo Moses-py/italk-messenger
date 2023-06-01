@@ -1,30 +1,31 @@
 "use client";
 
-import Button from "@/app/components/buttons/Button";
-import Input from "@/app/components/input/Input";
-import { useCallback, useEffect, useState } from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import AuthSocialButton from "./AuthSocialButton";
-import { BsGithub, BsGoogle } from "react-icons/bs";
 import axios from "axios";
-import { toast } from "react-hot-toast";
 import { signIn, useSession } from "next-auth/react";
+import { useCallback, useEffect, useState } from "react";
+import { BsGithub, BsGoogle } from "react-icons/bs";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+
+import Input from "@/app/components/inputs/Input";
+import AuthSocialButton from "./AuthSocialButton";
+import Button from "@/app/components/Button";
+import { toast } from "react-hot-toast";
 
 type Variant = "LOGIN" | "REGISTER";
 
 const AuthForm = () => {
   const session = useSession();
-  const [variant, setVariant] = useState<Variant>("LOGIN");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
+  const [variant, setVariant] = useState<Variant>("LOGIN");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (session?.status === "authenticated") {
-      toast("Authenticated");
-      router.push("/users");
+      toast.success("Authenticated!");
+      router.push("/conversations");
     }
-  }, [router, session?.status]);
+  }, [session?.status, router]);
 
   const toggleVariant = useCallback(() => {
     if (variant === "LOGIN") {
@@ -46,139 +47,166 @@ const AuthForm = () => {
     },
   });
 
-  const submit: SubmitHandler<FieldValues> = (data) => {
+  const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
 
     if (variant === "REGISTER") {
-      // Make axios register request
       axios
         .post("/api/register", data)
-        .then(() => {
+        .then(() =>
           signIn("credentials", {
             ...data,
             redirect: false,
-          }).then((callback) => {
-            if (callback?.ok && !callback?.error) {
-              toast.success("Redirecting");
-              router.push("/users");
-            }
-          });
-        })
+          })
+        )
+        .then((callback) => {
+          if (callback?.error) {
+            toast.error("Invalid credentials!");
+          }
 
-        .catch(() => {
-          toast.error("Something went wrong");
+          if (callback?.ok) {
+            router.push("/conversations");
+          }
         })
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .catch(() => toast.error("Something went wrong!"))
+        .finally(() => setIsLoading(false));
     }
+
     if (variant === "LOGIN") {
-      // Make axios Login request
       signIn("credentials", {
         ...data,
         redirect: false,
       })
         .then((callback) => {
           if (callback?.error) {
-            toast.error("Invalid credentials");
+            toast.error("Invalid credentials!");
           }
 
-          if (callback?.ok && !callback?.error) {
-            toast.success("Logged in");
-            router.push("/users");
+          if (callback?.ok) {
+            router.push("/conversations");
           }
         })
-        .finally(() => {
-          setIsLoading(false);
-        });
+        .finally(() => setIsLoading(false));
     }
   };
 
-  const socialAuth = (action: string) => {
+  const socialAction = (action: string) => {
     setIsLoading(true);
+
     signIn(action, { redirect: false })
       .then((callback) => {
         if (callback?.error) {
           toast.error("Invalid credentials!");
         }
 
-        if (callback?.ok && !callback?.error) {
-          toast.success("Logged in");
+        if (callback?.ok) {
+          toast.success("Logging in");
+          router.push("/conversations");
         }
       })
       .finally(() => setIsLoading(false));
-
-    // NextAuth social login
   };
+
   return (
-    <>
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="border-gray-100 border bg-white px-4 py-10 sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit(submit)}>
-            {variant === "REGISTER" && (
-              <Input
-                label="Name"
-                register={register}
-                id="name"
-                errors={errors}
-                disabled={isLoading}
-              />
-            )}
+    <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+      <div
+        className="
+        bg-white
+          px-4
+          py-8
+          shadow
+          sm:rounded-lg
+          sm:px-10
+        "
+      >
+        <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          {variant === "REGISTER" && (
             <Input
-              label="Email address"
-              type="email"
-              register={register}
-              id="email"
-              errors={errors}
               disabled={isLoading}
-            />
-            <Input
-              label="Password"
-              type="password"
               register={register}
-              id="password"
               errors={errors}
-              disabled={isLoading}
+              required
+              id="name"
+              label="Name"
             />
-            <div>
-              <Button fullWidth type="submit" disabled={isLoading}>
-                {variant === "LOGIN" ? "Sign in" : "Register"}
-              </Button>
+          )}
+          <Input
+            disabled={isLoading}
+            register={register}
+            errors={errors}
+            required
+            id="email"
+            label="Email address"
+            type="email"
+          />
+          <Input
+            disabled={isLoading}
+            register={register}
+            errors={errors}
+            required
+            id="password"
+            label="Password"
+            type="password"
+          />
+          <div>
+            <Button disabled={isLoading} fullWidth type="submit">
+              {variant === "LOGIN" ? "Sign in" : "Register"}
+            </Button>
+          </div>
+        </form>
+
+        <div className="mt-6">
+          <div className="relative">
+            <div
+              className="
+                absolute 
+                inset-0 
+                flex 
+                items-center
+              "
+            >
+              <div className="w-full border-t border-gray-300" />
             </div>
-          </form>
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="bg-white px-2 text-gray-500">
-                  or continue with
-                </span>
-              </div>
-            </div>
-            <div className="mt-6 flex gap-2">
-              <AuthSocialButton icon={BsGithub} onClick={() => {}} />
-              <AuthSocialButton
-                icon={BsGoogle}
-                onClick={() => socialAuth("google")}
-              />
+            <div className="relative flex justify-center text-sm">
+              <span className="bg-white px-2 text-gray-500">
+                Or continue with
+              </span>
             </div>
           </div>
 
-          <div className="flex gap-2 justify-center text-sm mt-6 px-2 text-gray-500">
-            <div>
-              {variant === "LOGIN"
-                ? "New to messenger?"
-                : "Already have an account"}
-            </div>
-            <div onClick={toggleVariant} className="underline cursor-pointer">
-              {variant === "LOGIN" ? "Create an account" : "Login"}
-            </div>
+          <div className="mt-6 flex gap-2">
+            <AuthSocialButton
+              icon={BsGithub}
+              onClick={() => socialAction("github")}
+            />
+            <AuthSocialButton
+              icon={BsGoogle}
+              onClick={() => socialAction("google")}
+            />
+          </div>
+        </div>
+        <div
+          className="
+            flex 
+            gap-2 
+            justify-center 
+            text-sm 
+            mt-6 
+            px-2 
+            text-gray-500
+          "
+        >
+          <div>
+            {variant === "LOGIN"
+              ? "New to Messenger?"
+              : "Already have an account?"}
+          </div>
+          <div onClick={toggleVariant} className="underline cursor-pointer">
+            {variant === "LOGIN" ? "Create an account" : "Login"}
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

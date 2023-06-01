@@ -1,17 +1,20 @@
-"use client";
+'use client';
 
-import axios from "axios";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import { User } from "@prisma/client";
+import axios from 'axios';
+import React, { useState } from 'react'
+import { useRouter } from 'next/navigation';
+import { 
+  FieldValues, 
+  SubmitHandler, 
+  useForm 
+} from 'react-hook-form';
+import { User } from '@prisma/client';
 
-import Input from "../input/Input";
-import Select from "../input/Select";
-import Modal from "./Modal";
-import Button from "../buttons/Button";
-import { toast } from "react-hot-toast";
-import getCurrentUser from "@/app/actions/getCurrentUser";
+import Input from "../inputs/Input";
+import Select from '../inputs/Select';
+import Modal from './Modal';
+import Button from '../Button';
+import { toast } from 'react-hot-toast';
 
 interface GroupChatModalProps {
   isOpen?: boolean;
@@ -19,10 +22,10 @@ interface GroupChatModalProps {
   users: User[];
 }
 
-const GroupChatModal: React.FC<GroupChatModalProps> = ({
-  isOpen,
-  onClose,
-  users = [],
+const GroupChatModal: React.FC<GroupChatModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  users = []
 }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -32,74 +35,70 @@ const GroupChatModal: React.FC<GroupChatModalProps> = ({
     handleSubmit,
     setValue,
     watch,
-    formState: { errors },
+    formState: {
+      errors,
+    }
   } = useForm<FieldValues>({
     defaultValues: {
-      name: "",
-      members: [],
-    },
+      name: '',
+      members: []
+    }
   });
 
-  const members = watch("members");
+  const members = watch('members');
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsLoading(true);
-
-    axios
-      .post("/api/conversations", {
-        ...data,
-        isGroup: true,
-      })
-      .then(() => {
-        router.refresh();
-        onClose();
-      })
-      .catch((error) => {
-        console.log(error);
-        toast.error("Error occured");
-      })
-      .finally(() => setIsLoading(false));
-  };
+  
+    axios.post('/api/conversations', {
+      ...data,
+      isGroup: true
+    })
+    .then(() => {
+      router.refresh();
+      onClose();
+    })
+    .catch(() => toast.error('Something went wrong!'))
+    .finally(() => setIsLoading(false));
+  }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="space-y-12">
           <div className="border-b border-gray-900/10 pb-12">
-            <h2
+            <h2 
               className="
                 text-base 
                 font-semibold 
                 leading-7 
                 text-gray-900
               "
-            >
-              Create a group chat
-            </h2>
+              >
+                Create a group chat
+              </h2>
             <p className="mt-1 text-sm leading-6 text-gray-600">
               Create a chat with more than 2 people.
             </p>
             <div className="mt-10 flex flex-col gap-y-8">
               <Input
                 disabled={isLoading}
-                label="Name"
-                id="name"
-                errors={errors}
-                required
+                label="Name" 
+                id="name" 
+                errors={errors} 
+                required 
                 register={register}
               />
               <Select
                 disabled={isLoading}
-                label="Members"
-                options={users.map((user) => ({
-                  value: user.id,
-                  label: user.name,
-                }))}
-                onChange={(value) =>
-                  setValue("members", value, {
-                    shouldValidate: true,
-                  })
-                }
+                label="Members" 
+                options={users.map((user) => ({ 
+                  value: user.id, 
+                  label: user.name 
+                }))} 
+                onChange={(value) => setValue('members', value, { 
+                  shouldValidate: true 
+                })} 
                 value={members}
               />
             </div>
@@ -108,7 +107,7 @@ const GroupChatModal: React.FC<GroupChatModalProps> = ({
         <div className="mt-6 flex items-center justify-end gap-x-6">
           <Button
             disabled={isLoading}
-            onClick={onClose}
+            onClick={onClose} 
             type="button"
             secondary
           >
@@ -120,7 +119,7 @@ const GroupChatModal: React.FC<GroupChatModalProps> = ({
         </div>
       </form>
     </Modal>
-  );
-};
+  )
+}
 
 export default GroupChatModal;

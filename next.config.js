@@ -3,6 +3,7 @@ const nextConfig = {
   experimental: {
     swcPlugins: [["next-superjson-plugin", {}]],
   },
+  generateEtags: false,
   images: {
     domains: [
       "res.cloudinary.com",

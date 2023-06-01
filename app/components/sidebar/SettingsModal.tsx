@@ -7,9 +7,9 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { User } from "@prisma/client";
 import { CldUploadButton } from "next-cloudinary";
 
-import Input from "../input/Input";
+import Input from "../inputs/Input";
 import Modal from "../modals/Modal";
-import Button from "../buttons/Button";
+import Button from "../Button";
 import Image from "next/image";
 import { toast } from "react-hot-toast";
 
@@ -27,7 +27,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  // console.log(currentUser, "&TEST_CURRENT_USER");
+  console.log(currentUser, "&TEST_CURRENT_USER");
 
   const {
     register,
@@ -37,8 +37,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     formState: { errors },
   } = useForm<FieldValues>({
     defaultValues: {
-      name: currentUser?.name!,
-      image: currentUser?.image!,
+      name: currentUser?.name,
+      image: currentUser?.image,
     },
   });
 
@@ -109,7 +109,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                     width="48"
                     height="48"
                     className="rounded-full"
-                    src={image || currentUser?.image || "/placeholder.jpg"}
+                    src={
+                      image || currentUser?.image || "/images/placeholder.jpg"
+                    }
                     alt="Avatar"
                   />
                   <CldUploadButton
