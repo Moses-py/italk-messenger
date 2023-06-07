@@ -6,6 +6,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { useSession } from "next-auth/react";
 import { FullMessageType } from "@/app/types";
+import { BsReplyFill } from "react-icons/bs";
 
 import Avatar from "@/app/components/Avatar";
 import ImageModal from "./ImageModal";
@@ -29,9 +30,9 @@ const MessageBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
   const avatar = clsx(isOwn && "order-2");
   const body = clsx("flex flex-col gap-2", isOwn && "items-end");
   const message = clsx(
-    "text-sm w-fit overflow-hidden break-word h-auto",
+    "text-sm w-fit overflow-hidden break-word h-auto flex items-center gap-3",
     isOwn ? "bg-black text-white" : "bg-gray-100",
-    data.image ? "rounded-md p-0" : "rounded-full py-3 px-4"
+    data.image ? "rounded-md p-0" : "rounded-xl py-3 px-3"
   );
 
   return (
@@ -52,6 +53,7 @@ const MessageBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
             isOpen={imageModalOpen}
             onClose={() => setImageModalOpen(false)}
           />
+
           {data.image ? (
             <Image
               alt="Image"
@@ -70,6 +72,12 @@ const MessageBox: React.FC<MessageBoxProps> = ({ data, isLast }) => {
           ) : (
             <div className="break-word">{data.body}</div>
           )}
+          {/* {!isOwn && (
+            <BsReplyFill
+              className="text-[18px]"
+              onClick={() => alert("Clicked")}
+            />
+          )} */}
         </div>
         {isLast && isOwn && seenList.length > 0 && (
           <div
