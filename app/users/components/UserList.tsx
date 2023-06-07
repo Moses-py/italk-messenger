@@ -51,7 +51,7 @@ const UserList: React.FC<UserListProps> = ({ items }) => {
               py-4
             "
           >
-            Add a Friend
+            Add a friend
           </div>
         </div>
         <div>
